@@ -1,0 +1,146 @@
+{% extends 'sidebar.html' %}
+{% load static %}
+<!DOCTYPE html>
+<html>
+<head>
+<meta charset="UTF-8">
+<title>{% block title %} 랭킹차트 {% endblock %}</title>
+</head>
+{% block content %}
+<body>
+	<center>
+	<section class = "musicchart">
+		<span class = "title">{{member.name}}님을 위한 음악 추천&nbsp;&nbsp;&nbsp;</span>
+		<br>
+		<br>
+		
+		<table id = "musicchart_list" cellspacing = 0>
+				<br>
+				<thead>
+					<tr>
+						<th scope="col" class="chart_ranking">
+						   <div class="text">번호</div>
+						   <div class="clear"></div>
+						</th>
+						<th  scope="col" class="chart_musicname">
+						   <div class="text">곡명</div>
+						   <div class="clear"></div>
+						</th>
+						<th scope="col" class="chart_artist">
+						   <div class="text">아티스트</div>
+						   <div class="clear"></div>
+						</th>
+						<th></th>
+						<th scope="col" class="chart_artist">
+						   <div class="text">담기</div>
+						   <div class="clear"></div>
+						</th>
+						<th scope="col" class="chart_artist">
+						   <div class="text">좋아요</div>
+						   <div class="clear"></div>
+						</th>
+					</tr>
+				</thead>
+				<tbody class = "rank">
+				{% for post in posts %}
+				{% if post.num in member.com_genre %}
+					<tr style = "cursor:pointer" onclick="location='musicdetail?num={{post.num}}'">
+						<td class="tbody_ranking">{{forloop.counter}}</td>
+						<td class="tbody_musicname">{{post.title}}</td>
+						<td class="tbody_artist">{{post.singer}}</td>
+						<td class="tbody_musicname">{{post.album_name}}</td>
+						<td>
+						{% if memid %}
+							
+								{% if post.num == playlist.num %}
+								<form method="get" action="playlist_del" class="form">
+         						<input type="hidden" name="num" value="{{post.num}}">
+         						<input type="hidden" name="next" value="{{request.get_full_path}}">
+         						<button class="like_btn">
+         						<img name="playlist_del" onclick="javascript:playlistbtn2();" src="{% static 'playlist_del.png' %}" width=60 height=60>
+         						</button>
+         						</form>
+								{% endif %}
+								{% if post.num != playlist.num %}
+								<form method="get" action="playlist_set" class="form">
+         						<input type="hidden" name="num" value="{{post.num}}">
+         						<input type="hidden" name="next" value="{{request.get_full_path}}">
+         						<button class="like_btn">
+         						<img name="playlist" onclick="javascript:playlistbtn();" src="{% static 'playlist_press.png' %}" width=60 height=60>
+         						</button>
+         						</form>
+								{% endif %}
+					
+						{% endif %}
+						{% if not memid %} -- {% endif %}
+						</td>
+						<td> 
+						{% if memid %}
+								{% if post.num in like %}
+								<form method="get" action="Like_del" class="form">
+                  				<input type="hidden" name="num" value="{{post.num}}">
+                  				<input type="hidden" name="next" value="{{request.get_full_path}}">
+                  				<button class="like_btn">
+                   				<img style="padding-top:11px;" onclick="javascript:likebtn2();" src = "{% static 'full_like.png'%}" width = 35 height = 35>
+                   				</button>
+              					</form>
+								{% endif %}
+								{% if post.num not in like %}
+								<form method="get" action="Like_set" class="form">
+               					<input type="hidden" name="num" value="{{post.num}}">
+               					<input type="hidden" name="next" value="{{request.get_full_path}}">
+               					<button class="like_btn">
+               					<img style="padding-top:11px;" onclick="javascript:likebtn();" src = "{% static 'like.png'%}" width = 35 height = 35>
+               					</button>
+           						</form>
+								{% endif %}
+						{% endif %}
+						{% if not memid %} -- {% endif %}
+						</td>
+					</tr>
+					{% endif %}
+				{% endfor %}
+			</tbody>
+		</table>
+		<div class = "center">
+         <table class = "paging">
+            <span class = "pagenum">
+               {% load mathfilters %}
+               {% if startpage > pageblock %}
+                  <a href="allgenre?page={{1}}"> << </a>
+                  <a href="allgenre?page={{startpage|sub:pageblock}}"> < </a>      
+               {% endif %}
+               
+               {% if startpage <= pageblock %}
+                  <a class = "none" style="cursor:default" > << </a>
+                  <a class = "none"  style = "cursor:default" > < </a>      
+               {% endif %}
+               
+               {% for writepage in pages %}
+                  {% if writepage == page %}
+                     <b>{{writepage}}</b>
+                  {% endif %}
+                  {% if writepage != page %}
+                     <a href = "allgenre?page={{writepage}}">{{writepage}}</a>
+                  {% endif %}
+               {% endfor %}
+               
+               {% if endpage < pagecount %}
+                  <a href = "allgenre?page={{startpage|add:pageblock}}">></a>
+                  <a href="allgenre?page={{pagecount}}">>></a>
+               {% endif %}
+               {% if endpage >= pagecount %}
+                  <a class = "none" style = "cursor:default" >></a>
+                  <a class = "none" style = "cursor:default" >>></a>
+               {% endif %}
+            </span>
+         </table>
+         </div>
+         
+	</section>
+
+
+</center>
+</body>
+{% endblock %}
+</html>
